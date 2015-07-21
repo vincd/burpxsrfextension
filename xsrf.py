@@ -39,6 +39,8 @@ class BurpExtender(IBurpExtender, IHttpListener):
         headers.set(0, " ".join([http_info[0], uri, http_info[2]]))
 
         message = self._helpers.buildHttpMessage(headers, msg_body)
+        
+        return message
 
     def log(self, msg):
         self._stdout.println("[+] %s" % msg)
@@ -91,10 +93,10 @@ class BurpExtender(IBurpExtender, IHttpListener):
 
                 # send a GET request to *URI* to get a valid XSRF token
                 new_message = self.update_URI(self._helpers.toggleRequestMethod(request), BurpExtender.XSRF_URI)
-                self.log_request("XSRF request", xsrf_request)
+                self.log_request("XSRF request", new_message)
 
                 # send this request to get a valid XSRF token
-                xsrf_response = self._callbacks.makeHttpRequest(httpService, xsrf_request)
+                xsrf_response = self._callbacks.makeHttpRequest(httpService, new_message)
 
                 if xsrf_response:
                     xsrf_response = xsrf_response.getResponse()
